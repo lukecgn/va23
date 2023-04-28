@@ -1,3 +1,4 @@
+const fs = require("fs");
 const socket = require("socket.io");
 const express = require("express");
 
@@ -21,6 +22,20 @@ io.sockets.on("connection", (socket) => {
     socket.emit("example_data", { hello: "world" });
   };
 
+  let get_boardgames_data = (parameters) => {
+    console.log(`Received data request with these parameters: ${parameters}`);
+
+    fs.readFile("./data/boardgames_40.json", "utf8", (err, data) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      let json_data = JSON.parse(data);
+      socket.emit("boardgames_data", json_data);
+    });
+  }
+
   socket.on("disconnect", disconnect);
   socket.on("get_example_data", get_example_data);
+  socket.on("get_boardgames_data", get_boardgames_data);
 });

@@ -11,7 +11,8 @@
     <!-------------SCRIPTS------------->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="index.js"></script>  
+    <script src="index.js"></script>
+    <script src="parallel-coords.js"></script>  
   </head>
   <body>
     <div class="header">
@@ -25,13 +26,13 @@
         <button class="function_button" onclick="print_hello_world()">
           Say "Hello world!"
         </button>
-        <div class="buttons">
-          <button class="function_button" onclick="request_example_data()">
-            Get Data
-          </button>
-        </div>
+        <button class="function_button" onclick="request_boardgames_data()">
+          Get Data
+        </button>
       </div>
     </div>
-    <div class="content"></div>
+    <div class="content">
+      <div id="parallel-coords"></div>
+    </div>
   </body>
 </html>
