@@ -28,6 +28,7 @@ socket.on("boardgames_data", (obj) => {
   }
 
   parallel_coords.render("#parallel-coords", obj, dim, options);
+  barchart.render("#barchart", get_top_games_by_year(obj), options);
 })
 
 function request_example_data() {

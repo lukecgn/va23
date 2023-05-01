@@ -12,7 +12,9 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="index.js"></script>
-    <script src="parallel-coords.js"></script>  
+
+    <script src="parallel-coords.js"></script>
+    <script src="barchart.js"></script>
   </head>
   <body>
     <div class="header">
@@ -32,7 +34,8 @@
       </div>
     </div>
     <div class="content">
-      <div id="parallel-coords"></div>
+      <div id="parallel-coords" class="graph"></div>
+      <div id="barchart" class="graph"></div>
     </div>
   </body>
 </html>
