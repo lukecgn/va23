@@ -67,3 +67,20 @@ function get_top_games_by_year(data) {
 
     return result;
 }
+
+function get_top_games_by_author(data) {
+    const result = data.reduce((acc, { credit }) => {
+        for (const designer of credit.designer) {
+            const index = acc.findIndex(item => item.id === designer.name);
+            if (index === -1) {
+                acc.push({ id: designer.name, value: 1 });
+            } else {
+                acc[index].value++;
+            }
+        }
+        return acc;
+    }, []);
+    result.sort((a, b) => { return a.id - b.id });
+
+    return result;
+}
