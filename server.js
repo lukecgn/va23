@@ -13,25 +13,36 @@ console.log(`Webserver is running on port ${port}.`);
 io.sockets.on("connection", (socket) => {
   console.log(`Client ${socket.id} connected.`);
 
-  let disconnect = () => {
+  const disconnect = () => {
     console.log(`Client ${socket.id} disconnected.`);
   };
 
-  let get_example_data = (parameters) => {
+  const get_example_data = (parameters) => {
     console.log(`Received data request with these parameters: ${parameters}`);
     socket.emit("example_data", { hello: "world" });
   };
 
-  let get_boardgames_data = (parameters) => {
-    console.log(`Received data request with these parameters: ${parameters}`);
+  const get_boardgames_data = (params) => {
+    const { fileName } = params;
+    console.log(`Received data request with these parameters: ${params}`);
+    const path = "./data";
 
-    fs.readFile("./data/boardgames_40.json", "utf8", (err, data) => {
+    const allowedFiles = fs.readdirSync(path);
+    if (!allowedFiles.includes(fileName)) {
+      socket.emit("boardgames_data", "Nice try!");
+      return;
+    }
+
+    fs.readFile(`${path}/${fileName}`, "utf8", (err, data) => {
       if (err) {
         console.error(err);
         return;
       }
-      let json_data = JSON.parse(data);
-      socket.emit("boardgames_data", json_data);
+      const json_data = JSON.parse(data);
+      socket.emit("boardgames_data", {
+        fileName: fileName,
+        data: json_data,
+      });
     });
   };
 

@@ -3,10 +3,10 @@ var parallel_coords = (function () {
 
   return {
     render: function (selector, data, dimensions, options) {
-      const margin = { top: 30, right: 10, bottom: 10, left: 0 },
+      const margin = { top: 70, right: 10, bottom: 10, left: 0 },
         width = options.width - margin.left - margin.right,
         height = options.height - margin.top - margin.bottom;
-
+      const { title } = options;
       // append the svg object to the body of the page
       const svg = d3
         .select(selector)
@@ -15,14 +15,6 @@ var parallel_coords = (function () {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
-
-      // Parse the Data
-      // Extract the list of dimensions we want to keep in the plot. Here I keep all except the column called Species
-      if (dimensions === undefined) {
-        dimensions = Object.keys(data[0]).filter(function (d) {
-          return d != "Species";
-        });
-      }
 
       // For each dimension, I build a linear scale. I store all in a y object
       const y = {};
@@ -73,6 +65,8 @@ var parallel_coords = (function () {
         })
         // And I build the axis with the call function
         .each(function (dimension) {
+          const ticks = [...new Set(data.map((obj) => obj[dimension]))];
+
           d3.select(this).call(
             d3
               .axisLeft()
@@ -80,19 +74,30 @@ var parallel_coords = (function () {
               // D3 normally steps the data manually, thus it may contain floats although the data is int
               // fix it manually
               .tickValues(
-                y[dimension].ticks().filter((i) => Number.isInteger(i))
+                // dimension === "year"
+                //   ? Array.from(Array(20), (_, i) => 2002 + i)
+                //   : y[dimension].ticks().filter((i) => Number.isInteger(i))
+                ticks
               )
               .tickFormat(d3.format(".0f"))
           );
         })
         // Add axis title
         .append("text")
+        .attr("class", "axisTitle")
         .style("text-anchor", "middle")
         .attr("y", -9)
         .text(function (d) {
           return d;
         })
         .style("fill", "black");
+
+      // Tile
+      svg
+        .append("text")
+        .attr("class", "title")
+        .attr("transform", `translate(${width / 2}, -30)`)
+        .text(title);
     },
   };
 })();

@@ -14,9 +14,9 @@ svg {
 /* Grid-Layouting the Dashboard */
 body {
   display: grid;
-
   grid-template-areas: "header" "content";
   grid-template-rows: 100px auto;
+  overflow-y: scroll;
 }
 
 /* Layouting and styling the Header */
@@ -75,4 +75,14 @@ body {
 
 .graph {
   display: inline-block;
+}
+
+.axisTitle {
+  text-anchor: middle;
+  font-size: 1.3vmin;
+}
+
+.title {
+  text-anchor: middle;
+  font-size: 2vmin;
 }

@@ -20,26 +20,46 @@ socket.on("example_data", (obj) => {
   console.log(obj);
 });
 
-socket.on("boardgames_data", (obj) => {
-  console.log("Data", obj);
+socket.on("boardgames_data", ({ fileName, data }) => {
+  console.log("File", fileName);
+  console.log("Data", data);
   has_data = true;
-
-  const dim = [
-    "minplaytime",
-    "maxplaytime",
-    "year",
-    "rank",
-    "minage",
-    "minplayers",
-    "maxplayers",
-  ];
-  const options = {
-    width: 900,
-    height: 400,
-  };
-
-  parallel_coords.render("#parallel-coords", obj, dim, options);
-  barchart.render("#barchart", get_top_games_by_year(obj), options);
+  if (fileName === "boardgames_40.json") {
+    const options = {
+      width: window.innerWidth * 0.8,
+      height: 800,
+      title: "Parallel Coords Best 40 board games dataset",
+    };
+    const dim = [
+      "minplaytime",
+      "maxplaytime",
+      "year",
+      "rank",
+      "minage",
+      "minplayers",
+      "maxplayers",
+    ];
+    // [1: 2]
+    parallel_coords.render("#parallel-coords", data, dim, options);
+  } else if (fileName === "boardgames_40_agg_minage_based_games.json") {
+    const options = {
+      width: window.innerWidth * 0.8,
+      height: 800,
+      title: "Games in the top 40 per min-age",
+      xTitle: "Min Age",
+      yTitle: "Count",
+    };
+    barchart.render("#barchart", data, options);
+  } // else if ("boardgames_40_agg_ratio_reviews_per_group_minage.json") {
+  //   const options = {
+  //     width: window.innerWidth * 0.8,
+  //     height: 800,
+  //     title: "Avg. reviews per min-age groups",
+  //     xTitle: "Min Age",
+  //     yTitle: "Percentage of total reviews",
+  //   };
+  //   barchart.render("#barchart_reviews", data, options);
+  // }
 });
 
 function request_example_data() {
@@ -48,8 +68,19 @@ function request_example_data() {
 
 function request_boardgames_data() {
   if (!has_data) {
-    socket.emit("get_boardgames_data", { example_parameter: "hi" });
+    socket.emit("get_boardgames_data", { fileName: "boardgames_40.json" });
+    socket.emit("get_boardgames_data", {
+      fileName: "boardgames_40_agg_minage_based_games.json",
+    });
   } else {
     console.log("has_data");
   }
 }
+
+addEventListener("resize", (event) => {
+  location.reload();
+});
+
+onresize = (event) => {
+  location.reload();
+};
