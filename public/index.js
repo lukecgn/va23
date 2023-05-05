@@ -24,16 +24,24 @@ socket.on("boardgames_data", (obj) => {
   console.log("Data", obj);
   has_data = true;
 
-  const dim = ["minplaytime", "maxplaytime", "year", "rank", "minage", "minplayers", "maxplayers"];
+  const dim = [
+    "minplaytime",
+    "maxplaytime",
+    "year",
+    "rank",
+    "minage",
+    "minplayers",
+    "maxplayers",
+  ];
   const options = {
-    "width": 900,
-    "height": 400
-  }
+    width: 900,
+    height: 400,
+  };
 
   parallel_coords.render("#parallel-coords", obj, dim, options);
   barchart.render("#barchart", get_top_games_by_author(obj), options);
   console.log(get_top_games_by_author(obj));
-})
+});
 
 function request_example_data() {
   socket.emit("get_example_data", { example_parameter: "hi" });

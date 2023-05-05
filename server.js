@@ -33,7 +33,7 @@ io.sockets.on("connection", (socket) => {
       let json_data = JSON.parse(data);
       socket.emit("boardgames_data", json_data);
     });
-  }
+  };
 
   socket.on("disconnect", disconnect);
   socket.on("get_example_data", get_example_data);
