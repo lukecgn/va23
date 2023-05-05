@@ -26,16 +26,16 @@ var parallel_coords = (function () {
 
       // For each dimension, I build a linear scale. I store all in a y object
       const y = {};
-      for (i in dimensions) {
-        name = dimensions[i];
-        y[name] = d3
+      for (const dimension of dimensions) {
+        const axis = d3
           .scaleLinear()
           .domain(
             d3.extent(data, function (d) {
-              return +d[name];
+              return +d[dimension];
             })
           )
           .range([height, 0]);
+        y[dimension] = axis;
       }
 
       // Build the X scale -> it find the best position for each Y axis
@@ -72,8 +72,18 @@ var parallel_coords = (function () {
           return "translate(" + x(d) + ")";
         })
         // And I build the axis with the call function
-        .each(function (d) {
-          d3.select(this).call(d3.axisLeft().scale(y[d]));
+        .each(function (dimension) {
+          d3.select(this).call(
+            d3
+              .axisLeft()
+              .scale(y[dimension])
+              // D3 normally steps the data manually, thus it may contain floats although the data is int
+              // fix it manually
+              .tickValues(
+                y[dimension].ticks().filter((i) => Number.isInteger(i))
+              )
+              .tickFormat(d3.format(".0f"))
+          );
         })
         // Add axis title
         .append("text")

@@ -33,7 +33,14 @@ var barchart = (function () {
         .range([0, width])
         .padding(0.1);
 
-      var y_axis = d3.axisLeft().scale(y);
+      var y_axis = d3
+        .axisLeft()
+        .scale(y)
+        // D3 normally steps the data manually, thus it may contain floats although the data is int
+        // fix it manually
+        .tickValues(y.ticks().filter((i) => Number.isInteger(i)))
+        .tickFormat(d3.format(".0f"));
+
       var x_axis = d3.axisBottom().scale(x);
 
       // Draw the y-axis:
