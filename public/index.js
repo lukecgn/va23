@@ -32,13 +32,13 @@ socket.on("boardgames_data", ({ fileName, data }) => {
       title: "Parallel Coords Best 40 board games dataset",
     };
     const dim = [
-      "minplaytime",
-      "maxplaytime",
       "year",
       "rank",
+      "minplaytime",
+      "maxplayers",
+      "maxplaytime",
       "minage",
       "minplayers",
-      "maxplayers",
     ];
     // [1: 2]
     parallel_coords.render("#parallel-coords", data, dim, options)
