@@ -6,6 +6,7 @@ function print_hello_world() {
 // https://socket.io/docs/v4/client -installation/#standalone -build
 const socket = io();
 let has_data = false;
+let defautShownData = "#parallel-coords"
 
 socket.on("connect", () => {
   console.log("Connected to the webserver.");
@@ -40,7 +41,7 @@ socket.on("boardgames_data", ({ fileName, data }) => {
       "maxplayers",
     ];
     // [1: 2]
-    parallel_coords.render("#parallel-coords", data, dim, options);
+    parallel_coords.render("#parallel-coords", data, dim, options)
   } else if (fileName === "boardgames_40_agg_minage_based_games.json") {
     const options = {
       width: window.innerWidth * 0.8,
@@ -50,6 +51,7 @@ socket.on("boardgames_data", ({ fileName, data }) => {
       yTitle: "Count",
     };
     barchart.render("#barchart", data, options);
+    document.getElementById("barchart").classList.add("hidden");
   } // else if ("boardgames_40_agg_ratio_reviews_per_group_minage.json") {
   //   const options = {
   //     width: window.innerWidth * 0.8,
@@ -84,3 +86,9 @@ addEventListener("resize", (event) => {
 onresize = (event) => {
   location.reload();
 };
+
+switchVisualisation = () => {
+  Array.from(document.getElementsByClassName("graph")).forEach(e => {
+    e.classList.contains("hidden") ? e.classList.remove("hidden") : e.classList.add("hidden")
+  });
+}
