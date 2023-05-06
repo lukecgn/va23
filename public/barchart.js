@@ -50,6 +50,7 @@ var barchart = (function () {
         .data(data)
         .enter()
         .append("rect")
+        .style("fill", "rgb(58,0,255)")
         .attr("x", (d) => {
           return x(d.id);
         })

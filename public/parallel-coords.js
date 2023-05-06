@@ -49,7 +49,7 @@ var parallel_coords = (function () {
         .join("path")
         .attr("d", path)
         .style("fill", "none")
-        .style("stroke", "#69b3a2")
+        .style("stroke", "rgb(58,0,255)")
         .style("opacity", 0.5);
 
       // Draw the axis:
@@ -84,7 +84,7 @@ var parallel_coords = (function () {
         })
         // Add axis title
         .append("text")
-        .attr("class", "axisTitle")
+        .attr("class", "axisTitle parallel")
         .style("text-anchor", "middle")
         .attr("y", -9)
         .text(function (d) {

@@ -79,12 +79,20 @@ body {
 
 .axisTitle {
   text-anchor: middle;
-  font-size: 1.3vmin;
+  font-size: 2.6vmin;
+}
+
+.parallel {
+  font-size: 2vmin;
 }
 
 .title {
   text-anchor: middle;
-  font-size: 2vmin;
+  font-size: 4vmin;
+}
+
+text {
+  font-size: 1.3vmin;
 }
 
 .hidden {
