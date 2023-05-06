@@ -86,3 +86,7 @@ body {
   text-anchor: middle;
   font-size: 2vmin;
 }
+
+.hidden {
+  display: none;
+}
