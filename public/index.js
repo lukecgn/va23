@@ -87,7 +87,7 @@ onresize = (event) => {
   location.reload();
 };
 
-switchVisualisation = () => {
+switchVisualization = () => {
   Array.from(document.getElementsByClassName("graph")).forEach(e => {
     e.classList.contains("hidden") ? e.classList.remove("hidden") : e.classList.add("hidden")
   });
