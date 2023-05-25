@@ -1,12 +1,8 @@
-function print_hello_world() {
-  console.log("Hello world!");
-}
-
 // this is working because of the import in the html file
 // https://socket.io/docs/v4/client -installation/#standalone -build
 const socket = io();
 let has_data = false;
-let defautShownData = "#parallel-coords"
+let defautShownData = "#parallel-coords";
 
 socket.on("connect", () => {
   console.log("Connected to the webserver.");
@@ -22,8 +18,6 @@ socket.on("example_data", (obj) => {
 });
 
 socket.on("boardgames_data", ({ fileName, data }) => {
-  console.log("File", fileName);
-  console.log("Data", data);
   has_data = true;
   if (fileName === "boardgames_40.json") {
     const options = {
@@ -41,7 +35,8 @@ socket.on("boardgames_data", ({ fileName, data }) => {
       "minplayers",
     ];
     // [1: 2]
-    parallel_coords.render("#parallel-coords", data, dim, options)
+    parallel_coords.render("#parallel-coords", data, dim, options);
+    document.getElementById("parallel-coords").classList.add("hidden");
   } else if (fileName === "boardgames_40_agg_minage_based_games.json") {
     const options = {
       width: window.innerWidth * 0.8,
@@ -52,16 +47,10 @@ socket.on("boardgames_data", ({ fileName, data }) => {
     };
     barchart.render("#barchart", data, options);
     document.getElementById("barchart").classList.add("hidden");
-  } // else if ("boardgames_40_agg_ratio_reviews_per_group_minage.json") {
-  //   const options = {
-  //     width: window.innerWidth * 0.8,
-  //     height: 800,
-  //     title: "Avg. reviews per min-age groups",
-  //     xTitle: "Min Age",
-  //     yTitle: "Percentage of total reviews",
-  //   };
-  //   barchart.render("#barchart_reviews", data, options);
-  // }
+  } else if (fileName === "boardgames_100_lda.json") {
+    lda(data);
+    document.getElementById("lda").classList.add("hidden");
+  }
 });
 
 function request_example_data() {
@@ -73,6 +62,9 @@ function request_boardgames_data() {
     socket.emit("get_boardgames_data", { fileName: "boardgames_40.json" });
     socket.emit("get_boardgames_data", {
       fileName: "boardgames_40_agg_minage_based_games.json",
+    });
+    socket.emit("get_boardgames_data", {
+      fileName: "boardgames_100_lda.json",
     });
   } else {
     console.log("has_data");
@@ -87,8 +79,10 @@ onresize = (event) => {
   location.reload();
 };
 
-switchVisualization = () => {
-  Array.from(document.getElementsByClassName("graph")).forEach(e => {
-    e.classList.contains("hidden") ? e.classList.remove("hidden") : e.classList.add("hidden")
+switchVisualization = (graphName) => {
+  Array.from(document.getElementsByClassName("graph")).forEach((e) => {
+    e.id.includes(graphName)
+      ? e.classList.remove("hidden")
+      : e.classList.add("hidden");
   });
-}
+};
