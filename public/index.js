@@ -50,6 +50,9 @@ socket.on("boardgames_data", ({ fileName, data }) => {
   } else if (fileName === "boardgames_100_lda.json") {
     lda(data);
     document.getElementById("lda").classList.add("hidden");
+  } else if (fileName === "boardgames_100_kmeans.json") {
+    document.getElementById("kmeans").classList.add("hidden");
+    renderKmeans(data);
   }
 });
 
@@ -65,6 +68,9 @@ function request_boardgames_data() {
     });
     socket.emit("get_boardgames_data", {
       fileName: "boardgames_100_lda.json",
+    });
+    socket.emit("get_boardgames_data", {
+      fileName: "boardgames_100_kmeans.json",
     });
   } else {
     console.log("has_data");

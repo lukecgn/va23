@@ -1,5 +1,132 @@
 /* k-means implementation in 2D */
 
+function renderKmeans(input) {
+  const data = input.map((item) => ({
+    x: item.rating.rating,
+    y: item.rating.num_of_reviews,
+  }));
+
+  const minX = d3.min(data.map((item) => item.x));
+  const maxX = d3.max(data.map((item) => item.x));
+  console.log(minX);
+  const minY = d3.min(data.map((item) => item.y));
+  const maxY = d3.max(data.map((item) => item.y));
+
+  const normalizedData = data.map((item) => ({
+    x: (item.x - minX) / (maxX - minX),
+    y: (item.y - minY) / (maxY - minY),
+  }));
+
+  const [clusteredDatapoints, centroid] = kmeans(
+    normalizedData,
+    5,
+    euclid,
+    mean
+  );
+
+  const denormalizedData = clusteredDatapoints.map((item) => ({
+    x: item.x * (maxX - minX) + minX,
+    y: item.y * (maxY - minY) + minY,
+    centroid_index: item.centroid_index,
+  }));
+
+  // set the dimensions and margins of the graph
+  var margin = { top: 70, right: 30, bottom: 30, left: 60 },
+    width = 900 - margin.left - margin.right,
+    height = 900 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  var svg = d3
+    .select("#kmeans")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Add X axis
+  const domainX = [
+    d3.min(denormalizedData.map((obj) => obj.x)),
+    d3.max(denormalizedData.map((obj) => obj.x)),
+  ];
+
+  var x = d3.scaleLinear().domain(domainX).range([0, width]);
+  svg
+    .append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+  // Add Y axis
+  const domainY = [
+    d3.min(denormalizedData.map((obj) => obj.y)),
+    d3.max(denormalizedData.map((obj) => obj.y)),
+  ];
+
+  var y = d3.scaleLinear().domain(domainY).range([height, 0]);
+  svg.append("g").call(d3.axisLeft(y));
+
+  const colorScale = d3
+    .scaleOrdinal()
+    .domain([...new Set(denormalizedData.map((item) => item.centroid_index))])
+    .range(d3.schemeCategory10);
+
+  svg
+    .append("text")
+    .attr("class", "title")
+    .attr("transform", `translate(${width / 2}, -30)`)
+    .text("Top 100 board games grouped by ....");
+  svg
+    .append("g")
+    .selectAll("dot")
+    .data(denormalizedData)
+    .enter()
+    .append("circle")
+    .attr("cx", function (obj) {
+      return x(obj.x);
+    })
+    .attr("cy", function (obj) {
+      return y(obj.y);
+    })
+    .attr("r", 5)
+    .style("fill", function (obj) {
+      return colorScale(obj.centroid_index);
+    });
+}
+
+/**
+ * Performs the k-means clustering algorithm on the given data points.
+ *
+ * @param {[{ x, y }, ...]} datapoints - all available data points
+ * @param {Number} k - number of clusters
+ * @param {Function} distance_function - calculates the distance between points
+ * @param {Function} measure_function - measure of data set (e.g. mean-function, median-function, ...)
+ * @returns {[[{ x, y, centroid_index }, ...], [{ x, y }, ...]]} - clustered data points and final centroids
+ */
+function kmeans(datapoints, k, distance_function, measure_function) {
+  let centroids = get_random_centroids(datapoints, k);
+  let assignedDatapoints = assign_datapoints_to_centroids(
+    datapoints,
+    centroids,
+    distance_function
+  );
+
+  let centroidsChanged = true;
+  while (centroidsChanged) {
+    const { centroids: newCentroids, centroids_changed } =
+      calculate_new_centroids(assignedDatapoints, centroids, measure_function);
+
+    assignedDatapoints = assign_datapoints_to_centroids(
+      assignedDatapoints,
+      newCentroids,
+      distance_function
+    );
+    centroids = newCentroids;
+    centroidsChanged = centroids_changed;
+  }
+
+  return [assignedDatapoints, centroids];
+}
+
 /**
  * Calculates the mean for x and y of the given data points.
  *
@@ -124,6 +251,7 @@ function calculate_new_centroids(datapoints, centroids, measure_function) {
     const centroidPoints = datapoints.filter(
       (point) => point.centroid_index === i
     );
+    if (centroidPoints.length === 0) continue;
 
     const newCentroid = measure_function(centroidPoints);
 
