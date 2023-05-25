@@ -3,12 +3,13 @@ var parallel_coords = (function () {
 
   return {
     render: function (selector, data, options) {
-      console.log(data);
-      const margin = { top: 70, right: 10, bottom: 10, left: 60 },
+      const margin = { top: 70, right: 10, bottom: 10, left: 0 },
         width = options.width - margin.left - margin.right,
         height = options.height - margin.top - margin.bottom;
 
-      const x = d3.scaleBand().range([0, width]).padding(0.1);
+      var dimensions = Object.keys(data[0]);
+
+      const x = d3.scaleBand().range([0, width]).padding(1).domain(dimensions);
       const y = {};
       const dragging = {};
 
@@ -24,9 +25,6 @@ var parallel_coords = (function () {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-      var dimensions = Object.keys(data[0]);
-      x.domain(dimensions);
 
       dimensions.forEach((d) => {
         y[d] = d3
@@ -115,6 +113,13 @@ var parallel_coords = (function () {
         .attr("y", -9)
         .text((d) => d)
         .style("fill", "black");
+
+      // Title
+      svg
+        .append("text")
+        .attr("class", "title")
+        .attr("transform", `translate(${width / 2}, -30)`)
+        .text(options.title);
 
       function position(d) {
         const v = dragging[d];
