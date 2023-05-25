@@ -86,6 +86,24 @@ var parallel_coords = (function () {
             })
         );
 
+      // Add and store a brush for each axis.
+      g.append("g")
+        .attr("class", "brush")
+        .each(function (d) {
+          d3.select(this).call(
+            (y[d].brush = d3
+              .brushY()
+              .extent([
+                [-8, 0],
+                [8, height],
+              ])
+              .on("start", brushstart)
+              .on("brush", brush))
+          );
+        })
+        .selectAll("rect")
+        .attr("width", 16);
+
       // Add an axis and title.
       g.append("g")
         .attr("class", "axis")
@@ -132,6 +150,34 @@ var parallel_coords = (function () {
 
       function path(d) {
         return line(dimensions.map((p) => [position(p), y[p](d[p])]));
+      }
+
+      function brushstart(event) {
+        event.sourceEvent.stopPropagation();
+      }
+
+      var actives = {};
+      function brush(event, d) {
+        const boders = event.selection.map(y[d].invert);
+        actives[d] = [d3.min(boders), d3.max(boders)];
+        var extents = Object.values(actives);
+        foreground.style("display", function (v) {
+          return Object.keys(actives).every(function (p, i) {
+            var extent = extents[i];
+            const lowerBorder = extent[0];
+            const upperBorder = extent[1];
+            const value = v[p];
+            return lowerBorder <= value && value <= upperBorder;
+          })
+            ? null
+            : "none";
+        });
+
+        dimensions.forEach((dimension) => {
+          svg
+            .select(`g[data-id="${dimension}"]`)
+            .classed("selected", Object.keys(actives).includes(dimension));
+        });
       }
     },
   };
