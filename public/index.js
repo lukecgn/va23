@@ -25,6 +25,19 @@ socket.on("boardgames_data", ({ fileName, data }) => {
       height: 800,
       title: "Parallel Coords Best 40 board games dataset",
     };
+
+    function copyArrayWithWhitelistedKeys(arr, keys) {
+      return arr.map(function (obj) {
+        var newObj = {};
+        keys.forEach(function (key) {
+          if (obj.hasOwnProperty(key)) {
+            newObj[key] = obj[key];
+          }
+        });
+        return newObj;
+      });
+    }
+
     const dim = [
       "year",
       "rank",
@@ -35,7 +48,11 @@ socket.on("boardgames_data", ({ fileName, data }) => {
       "minplayers",
     ];
     // [1: 2]
-    parallel_coords.render("#parallel-coords", data, dim, options);
+    parallel_coords.render(
+      "#parallel-coords",
+      copyArrayWithWhitelistedKeys(data, dim),
+      options
+    );
     document.getElementById("parallel-coords").classList.add("hidden");
   } else if (fileName === "boardgames_40_agg_minage_based_games.json") {
     const options = {

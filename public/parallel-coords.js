@@ -2,75 +2,103 @@ var parallel_coords = (function () {
   // Adapted from https://d3-graph-gallery.com/graph/parallel_basic.html
 
   return {
-    render: function (selector, data, dimensions, options) {
-      const margin = { top: 70, right: 10, bottom: 10, left: 0 },
+    render: function (selector, data, options) {
+      console.log(data);
+      const margin = { top: 70, right: 10, bottom: 10, left: 60 },
         width = options.width - margin.left - margin.right,
         height = options.height - margin.top - margin.bottom;
-      const { title } = options;
-      // append the svg object to the body of the page
+
+      const x = d3.scaleBand().range([0, width]).padding(0.1);
+      const y = {};
+      const dragging = {};
+
+      const line = d3.line();
+      const axis = d3.axisLeft();
+      let background;
+      let foreground;
+
       const svg = d3
         .select(selector)
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-      // For each dimension, I build a linear scale. I store all in a y object
-      const y = {};
-      for (const dimension of dimensions) {
-        const axis = d3
+      var dimensions = Object.keys(data[0]);
+      x.domain(dimensions);
+
+      dimensions.forEach((d) => {
+        y[d] = d3
           .scaleLinear()
-          .domain(
-            d3.extent(data, function (d) {
-              return +d[dimension];
-            })
-          )
+          .domain(d3.extent(data, (p) => +p[d]))
           .range([height, 0]);
-        y[dimension] = axis;
-      }
+      });
 
-      // Build the X scale -> it find the best position for each Y axis
-      x = d3.scalePoint().range([0, width]).padding(1).domain(dimensions);
-
-      // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
-      function path(d) {
-        return d3.line()(
-          dimensions.map(function (p) {
-            return [x(p), y[p](d[p])];
-          })
-        );
-      }
-
-      // Draw the lines
-      svg
-        .selectAll("myPath")
+      background = svg
+        .append("g")
+        .attr("class", "background")
+        .selectAll("path")
         .data(data)
         .join("path")
-        .attr("d", path)
-        .style("fill", "none")
-        .style("stroke", "rgb(58,0,255)")
-        .style("opacity", 0.5);
+        .attr("d", path);
 
-      // Draw the axis:
-      svg
-        .selectAll("myAxis")
-        // For each dimension of the dataset I add a 'g' element:
-        .data(dimensions)
-        .enter()
+      foreground = svg
         .append("g")
-        // I translate this element to its right position on the x axis
-        .attr("transform", function (d) {
-          return "translate(" + x(d) + ")";
-        })
+        .attr("class", "foreground")
+        .selectAll("path")
+        .data(data)
+        .join("path")
+        .attr("d", path);
+
+      const g = svg
+        .selectAll(".dimension")
+        .data(dimensions)
+        .join("g")
+        .attr("class", "dimension")
+        .attr("data-id", (d) => d)
+        .attr("transform", (d) => `translate(${x(d)}, 0)`)
+        .call(
+          d3
+            .drag()
+            .on("start", (event, d) => {
+              dragging[d] = x(d);
+              background.attr("visibility", "hidden");
+            })
+            .on("drag", (event, d) => {
+              dragging[d] = Math.min(width, Math.max(0, event.x));
+              foreground.attr("d", path);
+              dimensions.sort((a, b) => position(a) - position(b));
+              x.domain(dimensions);
+              g.attr("transform", (d) => `translate(${position(d)}, 0)`);
+            })
+            .on("end", function (event, d) {
+              delete dragging[d];
+              transition(d3.select(this)).attr(
+                "transform",
+                `translate(${x(d)}, 0)`
+              );
+              transition(foreground).attr("d", path);
+              background
+                .attr("d", path)
+                .transition()
+                .delay(500)
+                .duration(0)
+                .attr("visibility", null);
+            })
+        );
+
+      // Add an axis and title.
+      g.append("g")
+        .attr("class", "axis")
         // And I build the axis with the call function
-        .each(function (dimension) {
-          const ticks = [...new Set(data.map((obj) => obj[dimension]))];
+        .each(function (d) {
+          const ticks = [...new Set(data.map((obj) => obj[d]))];
 
           d3.select(this).call(
             d3
               .axisLeft()
-              .scale(y[dimension])
+              .scale(y[d])
               // D3 normally steps the data manually, thus it may contain floats although the data is int
               // fix it manually
               .tickValues(
@@ -82,22 +110,24 @@ var parallel_coords = (function () {
               .tickFormat(d3.format(".0f"))
           );
         })
-        // Add axis title
         .append("text")
-        .attr("class", "axisTitle parallel")
         .style("text-anchor", "middle")
         .attr("y", -9)
-        .text(function (d) {
-          return d;
-        })
+        .text((d) => d)
         .style("fill", "black");
 
-      // Tile
-      svg
-        .append("text")
-        .attr("class", "title")
-        .attr("transform", `translate(${width / 2}, -30)`)
-        .text(title);
+      function position(d) {
+        const v = dragging[d];
+        return v == null ? x(d) : v;
+      }
+
+      function transition(g) {
+        return g.transition().duration(500);
+      }
+
+      function path(d) {
+        return line(dimensions.map((p) => [position(p), y[p](d[p])]));
+      }
     },
   };
 })();
