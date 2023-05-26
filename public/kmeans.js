@@ -31,8 +31,8 @@ function renderKmeans(input) {
   }));
 
   // set the dimensions and margins of the graph
-  var margin = { top: 70, right: 30, bottom: 60, left: 100 },
-    width = 1200 - margin.left - margin.right,
+  var margin = { top: 70, right: 30, bottom: 70, left: 100 },
+    width = 1300 - margin.left - margin.right,
     height = 900 - margin.top - margin.bottom;
 
   // append the svg object to the body of the page
@@ -65,29 +65,44 @@ function renderKmeans(input) {
   var y = d3.scaleLinear().domain(domainY).range([height, 0]);
   svg.append("g").call(d3.axisLeft(y));
 
+  const labels = [
+    ...new Set(denormalizedData.map((item) => item.centroid_index)),
+  ];
   const colorScale = d3
     .scaleOrdinal()
-    .domain([...new Set(denormalizedData.map((item) => item.centroid_index))])
+    .domain(labels)
     .range(d3.schemeCategory10);
 
   svg
     .append("text")
     .attr("class", "title")
     .attr("transform", `translate(${width / 2}, -30)`)
-    .text("Top 100 board games clustered by rating/number_of_reviews");
+    .text("Clustered top 100 board games (rating, number_of_reviews)");
 
   // X Axis Label
   svg
     .append("text")
     .attr("class", "axisTitle")
-    .attr("transform", `translate(${width / 2}, ${height + 40})`)
+    .attr("transform", `translate(${width / 2}, ${height + 50})`)
     .text("Rating");
+
   // Y Axis Label
   svg
     .append("text")
     .attr("class", "axisTitle")
-    .attr("transform", `translate(-60, ${height / 2}) rotate(-90)`)
+    .attr("transform", `translate(-70, ${height / 2}) rotate(-90)`)
     .text("Number of reviews");
+
+  //
+  labels.forEach((label) => {
+    svg
+      .append("text")
+      .attr("class", "clusterText")
+      .attr("fill", `${colorScale(label)}`)
+      .attr("transform", `translate(${width / 2 + 400}, ${40 + 30 * label})`)
+      .text(`- Cluster ${label}`);
+  });
+
   svg
     .append("g")
     .selectAll("dot")

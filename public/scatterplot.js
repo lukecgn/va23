@@ -3,7 +3,7 @@ var scatterplot = (function () {
     render: function (selector, data, options) {
       // set the dimensions and margins of the graph
       var margin = { top: 70, right: 30, bottom: 30, left: 60 },
-        width = 900 - margin.left - margin.right,
+        width = 1200 - margin.left - margin.right,
         height = 900 - margin.top - margin.bottom;
 
       // append the svg object to the body of the page
@@ -39,6 +39,18 @@ var scatterplot = (function () {
         .scaleOrdinal()
         .domain([...new Set(options.classes)])
         .range(["black", "red", "blue"]);
+
+      [...new Set(data.map((obj) => obj.class))].forEach((label) => {
+        svg
+          .append("text")
+          .attr("class", "clusterText")
+          .attr("fill", `${colorScale(label)}`)
+          .attr(
+            "transform",
+            `translate(${width / 2 + 400}, ${40 + 30 * label})`
+          )
+          .text(`- Cluster ${label}`);
+      });
 
       // Add dots
       // Title
