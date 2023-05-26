@@ -47,9 +47,9 @@ var scatterplot = (function () {
           .attr("fill", `${colorScale(label)}`)
           .attr(
             "transform",
-            `translate(${width / 2 + 400}, ${40 + 30 * label})`
+            `translate(${width / 2 + 380}, ${40 + 30 * label})`
           )
-          .text(`- Cluster ${label}`);
+          .text(`- minplayers ${label}`);
       });
 
       // Add dots
