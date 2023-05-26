@@ -31,8 +31,8 @@ function renderKmeans(input) {
   }));
 
   // set the dimensions and margins of the graph
-  var margin = { top: 70, right: 30, bottom: 30, left: 60 },
-    width = 900 - margin.left - margin.right,
+  var margin = { top: 70, right: 30, bottom: 60, left: 100 },
+    width = 1200 - margin.left - margin.right,
     height = 900 - margin.top - margin.bottom;
 
   // append the svg object to the body of the page
@@ -74,7 +74,20 @@ function renderKmeans(input) {
     .append("text")
     .attr("class", "title")
     .attr("transform", `translate(${width / 2}, -30)`)
-    .text("Top 100 board games grouped by ....");
+    .text("Top 100 board games clustered by rating/number_of_reviews");
+
+  // X Axis Label
+  svg
+    .append("text")
+    .attr("class", "axisTitle")
+    .attr("transform", `translate(${width / 2}, ${height + 40})`)
+    .text("Rating");
+  // Y Axis Label
+  svg
+    .append("text")
+    .attr("class", "axisTitle")
+    .attr("transform", `translate(-60, ${height / 2}) rotate(-90)`)
+    .text("Number of reviews");
   svg
     .append("g")
     .selectAll("dot")
