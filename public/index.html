@@ -19,6 +19,7 @@
     <script src="lda.js"></script>
     <script src="kmeans.js"></script>
     <script src="scatterplot.js"></script>
+    <script src="graph.js"></script>
   </head>
   <body>
     <div class="header">
@@ -47,6 +48,9 @@
         <button class="lda_button" onclick="switchVisualization('kmeans')">
           kMeans
         </button>
+        <button class="lda_button" onclick="switchVisualization('graph')">
+          Node Link
+        </button>
         <button class="lda_button" onclick="switchVisualization('pageRank')">
           PageRank
         </button>
@@ -62,7 +66,9 @@
         <br />
         <div id="kmeans" class="graph"></div>
         <br />
-        <div id="pagerank" class="graph"></div>
+        <div id="graph" class="graph">
+          <button id="reset-button">Reset Zoom</button>
+        </div>
       </center>
     </div>
   </body>

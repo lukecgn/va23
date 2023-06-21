@@ -24,7 +24,7 @@ io.sockets.on("connection", (socket) => {
   };
 
   const get_pagerank = (params) => {
-    fs.readFile("./data/boardgames_100_lda.json", "utf8", (err, data) => {
+    fs.readFile("./data/boardgames_100_graph.json", "utf8", (err, data) => {
       if (err) {
         console.error(err);
         return;
@@ -41,7 +41,7 @@ io.sockets.on("connection", (socket) => {
       });
 
       graph.rank(0.85, 0.000001, function (node, rank) {
-        const itemToUpdate = json_data.find(item => item.id == node);
+        const itemToUpdate = json_data.find((item) => item.id == node);
         if (itemToUpdate) {
           itemToUpdate["pagerank"] = rank;
         }

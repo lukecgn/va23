@@ -18,7 +18,8 @@ socket.on("example_data", (obj) => {
 });
 
 socket.on("pagerank_data", (obj) => {
-  console.log("Pagerank", obj);
+  document.getElementById("graph").classList.add("hidden");
+  renderGraph(obj);
 });
 
 socket.on("boardgames_data", ({ fileName, data }) => {
@@ -74,6 +75,7 @@ socket.on("boardgames_data", ({ fileName, data }) => {
   } else if (fileName === "boardgames_100_kmeans.json") {
     document.getElementById("kmeans");
     renderKmeans(data);
+  } else if (fileName === "boardgames_100_graph.json") {
   }
 });
 

@@ -151,3 +151,25 @@ g.dimension.selected .axis path.domain {
   stroke: red;
   stroke-width: 2px;
 }
+
+.node {
+  fill: gray;
+  stroke: #000;
+  cursor: pointer;
+}
+
+.node text {
+  font-size: 12px;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.label {
+  pointer-events: none;
+}
+
+.link {
+  stroke: orange;
+  stroke-width: 1px;
+  fill: none;
+}
