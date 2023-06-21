@@ -165,13 +165,20 @@ function renderGraph(dataset) {
   }
 
   function clicked(event, d) {
+    const dimming = 0.3;
     resetSelection();
+
+    if (d.selected) {
+      // Unselect the node
+      d.selected = false;
+      return;
+    }
 
     // Dim all nodes and links
     nodes.forEach((node) => (node.selected = false));
-    link.attr("opacity", 0.1);
-    node.attr("opacity", 0.1);
-    label.attr("opacity", 0.1);
+    link.attr("opacity", dimming);
+    node.attr("opacity", dimming);
+    label.attr("opacity", dimming);
 
     // Highlight selected node and its links
     d.selected = true;
@@ -180,11 +187,14 @@ function renderGraph(dataset) {
 
     link
       .filter((linkData) => /*linkData.source === d || */ linkData.target === d)
-      .attr("opacity", 1);
+      .attr("opacity", 1)
+      .style("stroke", "black");
 
     node
       .filter((nodeData) => {
-        return d.links.includes(nodeData.id) || nodeData.links.includes(d.id);
+        return /*d.links.includes(nodeData.id) || */ nodeData.links.includes(
+          d.id
+        );
       })
       .attr("opacity", 1);
 
@@ -192,15 +202,14 @@ function renderGraph(dataset) {
       .filter((nodeData) => {
         console.log(nodeData);
         return (
-          d.links.includes(nodeData.id) ||
-          nodeData.links.includes(d.id) ||
-          nodeData.id == d.id
+          /*d.links.includes(nodeData.id) ||*/
+          nodeData.links.includes(d.id) || nodeData.id == d.id
         );
       })
       .attr("opacity", 1);
 
     const selectedNodes = node.filter((nodeData) => {
-      return d.links.includes(nodeData.id) || nodeData.links.includes(d.id);
+      return /*d.links.includes(nodeData.id) ||*/ nodeData.links.includes(d.id);
     });
     console.log(selectedNodes);
     event.stopPropagation(); // Prevent click event from propagating to the SVG
@@ -210,6 +219,7 @@ function renderGraph(dataset) {
     // Restore opacity for all nodes and links
     node.attr("opacity", 1);
     node.attr("stroke", null);
+    link.style("stroke", null);
     link.attr("opacity", 1);
     label.attr("opacity", 1);
   }
