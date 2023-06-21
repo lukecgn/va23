@@ -73,6 +73,7 @@ function renderGraph(dataset) {
     degree: 0, // Initialize degree to 0
     rank: game.pagerank,
     links: [],
+    originalObj: game,
     selected: false, // Initial selection state
   }));
 
@@ -89,7 +90,7 @@ function renderGraph(dataset) {
         nodes[index].links.push(targetIndex);
 
         // Increment the degree of source and target nodes
-        nodes[index].degree++;
+        // nodes[index].degree++;
         nodes[targetIndex].degree++;
       }
     });
@@ -178,8 +179,12 @@ function renderGraph(dataset) {
       // Highlight selected node and its links
       d.selected = true;
       d3.select(this).attr("opacity", 1);
+      d3.select(this).attr("stroke", "black");
+
       link
-        .filter((linkData) => linkData.source === d || linkData.target === d)
+        .filter(
+          (linkData) => /*linkData.source === d || */ linkData.target === d
+        )
         .attr("opacity", 1);
 
       node
@@ -198,6 +203,11 @@ function renderGraph(dataset) {
           );
         })
         .attr("opacity", 1);
+
+      const selectedNodes = node.filter((nodeData) => {
+        return d.links.includes(nodeData.id) || nodeData.links.includes(d.id);
+      });
+      console.log(selectedNodes);
     }
     event.stopPropagation(); // Prevent click event from propagating to the SVG
   }
@@ -205,6 +215,7 @@ function renderGraph(dataset) {
   function resetSelection() {
     // Restore opacity for all nodes and links
     node.attr("opacity", 1);
+    node.attr("stroke", null);
     link.attr("opacity", 1);
     label.attr("opacity", 1);
   }

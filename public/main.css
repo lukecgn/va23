@@ -154,8 +154,8 @@ g.dimension.selected .axis path.domain {
 
 .node {
   fill: gray;
-  stroke: #000;
   cursor: pointer;
+  stroke-width: 5px;
 }
 
 .node text {
