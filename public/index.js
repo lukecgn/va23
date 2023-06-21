@@ -17,6 +17,10 @@ socket.on("example_data", (obj) => {
   console.log(obj);
 });
 
+socket.on("pagerank_data", (obj) => {
+  console.log("Pagerank", obj);
+});
+
 socket.on("boardgames_data", ({ fileName, data }) => {
   has_data = true;
   if (fileName === "boardgames_40.json") {
@@ -53,7 +57,7 @@ socket.on("boardgames_data", ({ fileName, data }) => {
       copyArrayWithWhitelistedKeys(data, dim),
       options
     );
-    document.getElementById("parallel-coords").classList.add("hidden");
+    document.getElementById("parallel-coords");
   } else if (fileName === "boardgames_40_agg_minage_based_games.json") {
     const options = {
       width: window.innerWidth * 0.8,
@@ -63,12 +67,12 @@ socket.on("boardgames_data", ({ fileName, data }) => {
       yTitle: "Count",
     };
     barchart.render("#barchart", data, options);
-    document.getElementById("barchart").classList.add("hidden");
+    document.getElementById("barchart");
   } else if (fileName === "boardgames_100_lda.json") {
     lda(data);
-    document.getElementById("lda").classList.add("hidden");
+    document.getElementById("lda");
   } else if (fileName === "boardgames_100_kmeans.json") {
-    document.getElementById("kmeans").classList.add("hidden");
+    document.getElementById("kmeans");
     renderKmeans(data);
   }
 });
@@ -89,6 +93,7 @@ function request_boardgames_data() {
     socket.emit("get_boardgames_data", {
       fileName: "boardgames_100_kmeans.json",
     });
+    socket.emit("get_pagerank", {});
   } else {
     console.log("has_data");
   }
@@ -102,7 +107,13 @@ onresize = (event) => {
   location.reload();
 };
 
+document.addEventListener("DOMContentLoaded", function (event) {
+  switchVisualization(window.sessionStorage.getItem("current_graph"));
+  console.log("Page loaded", window.sessionStorage.getItem("current_graph"));
+});
+
 switchVisualization = (graphName) => {
+  window.sessionStorage.setItem("current_graph", graphName);
   Array.from(document.getElementsByClassName("graph")).forEach((e) => {
     e.id.includes(graphName)
       ? e.classList.remove("hidden")
