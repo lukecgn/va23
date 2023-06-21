@@ -165,50 +165,44 @@ function renderGraph(dataset) {
   }
 
   function clicked(event, d) {
-    if (d.selected) {
-      // Unselect the node
-      d.selected = false;
-      resetSelection();
-    } else {
-      // Dim all nodes and links
-      nodes.forEach((node) => (node.selected = false));
-      link.attr("opacity", 0.1);
-      node.attr("opacity", 0.1);
-      label.attr("opacity", 0.1);
+    resetSelection();
 
-      // Highlight selected node and its links
-      d.selected = true;
-      d3.select(this).attr("opacity", 1);
-      d3.select(this).attr("stroke", "black");
+    // Dim all nodes and links
+    nodes.forEach((node) => (node.selected = false));
+    link.attr("opacity", 0.1);
+    node.attr("opacity", 0.1);
+    label.attr("opacity", 0.1);
 
-      link
-        .filter(
-          (linkData) => /*linkData.source === d || */ linkData.target === d
-        )
-        .attr("opacity", 1);
+    // Highlight selected node and its links
+    d.selected = true;
+    d3.select(this).attr("opacity", 1);
+    d3.select(this).attr("stroke", "black");
 
-      node
-        .filter((nodeData) => {
-          return d.links.includes(nodeData.id) || nodeData.links.includes(d.id);
-        })
-        .attr("opacity", 1);
+    link
+      .filter((linkData) => /*linkData.source === d || */ linkData.target === d)
+      .attr("opacity", 1);
 
-      label
-        .filter((nodeData) => {
-          console.log(nodeData);
-          return (
-            d.links.includes(nodeData.id) ||
-            nodeData.links.includes(d.id) ||
-            nodeData.id == d.id
-          );
-        })
-        .attr("opacity", 1);
-
-      const selectedNodes = node.filter((nodeData) => {
+    node
+      .filter((nodeData) => {
         return d.links.includes(nodeData.id) || nodeData.links.includes(d.id);
-      });
-      console.log(selectedNodes);
-    }
+      })
+      .attr("opacity", 1);
+
+    label
+      .filter((nodeData) => {
+        console.log(nodeData);
+        return (
+          d.links.includes(nodeData.id) ||
+          nodeData.links.includes(d.id) ||
+          nodeData.id == d.id
+        );
+      })
+      .attr("opacity", 1);
+
+    const selectedNodes = node.filter((nodeData) => {
+      return d.links.includes(nodeData.id) || nodeData.links.includes(d.id);
+    });
+    console.log(selectedNodes);
     event.stopPropagation(); // Prevent click event from propagating to the SVG
   }
 
