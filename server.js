@@ -34,8 +34,15 @@ io.sockets.on("connection", (socket) => {
       json_data.forEach((item) => {
         const id = parseInt(item["id"]);
         const games = item["recommendations"]["fans_liked"];
+        const categories = item["types"]["categories"].map((category) => category["id"]);
 
         games.forEach((game) => {
+          const game_json = json_data.find((item) => item.id == game);
+          let overlap = 1;
+          if (game_json !== undefined) {
+            const game_categories = game_json["types"]["categories"].map((category) => category["id"]);
+            overlap += game_categories.length + categories.length - new Set(game_categories.concat(categories)).size;
+          }
           graph.link(id, parseInt(game), 1.0);
         });
       });

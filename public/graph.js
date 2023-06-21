@@ -99,11 +99,11 @@ function renderGraph(dataset) {
   // Define the node size scale based on degree
   const nodeSizeScale = d3
     .scaleLinear()
-    .domain(d3.extent(nodes, (d) => d.rank))
-    .range([
+    .range([1, 20]) // Adjust the range as desired for minimum and maximum node sizes
+    .domain([
       d3.min(nodes.map((n) => n.rank)),
       d3.max(nodes.map((n) => n.rank)),
-    ]); // Adjust the range as desired for minimum and maximum node sizes
+    ]);
 
   // Create graph elements
   const link = zoomGroup
@@ -123,7 +123,7 @@ function renderGraph(dataset) {
     .enter()
     .append("circle")
     .attr("class", "node")
-    .attr("r", (d) => nodeSizeScale(d.degree))
+    .attr("r", (d) => nodeSizeScale(d.rank))
     .call(
       d3
         .drag()
@@ -143,7 +143,7 @@ function renderGraph(dataset) {
     .attr("font-size", 10)
     .attr("text-anchor", "middle")
     .attr("dy", function (d) {
-      return -d.degree;
+      return -nodeSizeScale(d.rank);
     });
 
   // Define drag functions
