@@ -1,3 +1,12 @@
+let selectedNodes = [];
+document.addEventListener("DOMContentLoaded", function (event) {
+  var mySelect = document.getElementById("propertyToCompare");
+  mySelect.onchange = (event) => {
+    d3.select("#graph-barchar > svg").remove();
+    if (selectedNodes.length > 0) drawBarchar(selectedNodes);
+  };
+});
+
 function renderGraph(dataset) {
   // Set the dimensions and margins of the graph
   var margin = { top: 70, right: 0, bottom: 30, left: 0 },
@@ -200,7 +209,6 @@ function renderGraph(dataset) {
 
     label
       .filter((nodeData) => {
-        console.log(nodeData);
         return (
           /*d.links.includes(nodeData.id) ||*/
           nodeData.links.includes(d.id) || nodeData.id == d.id
@@ -208,10 +216,15 @@ function renderGraph(dataset) {
       })
       .attr("opacity", 1);
 
-    const selectedNodes = node.filter((nodeData) => {
-      return /*d.links.includes(nodeData.id) ||*/ nodeData.links.includes(d.id);
-    });
-    console.log(selectedNodes);
+    // get nodes pointing to our selected one
+    node
+      .filter((nodeData) => {
+        return /*d.links.includes(nodeData.id) ||*/ nodeData.links.includes(
+          d.id
+        );
+      })
+      .each((node) => selectedNodes.push(node.originalObj));
+    drawBarchar(selectedNodes);
     event.stopPropagation(); // Prevent click event from propagating to the SVG
   }
 
@@ -222,6 +235,8 @@ function renderGraph(dataset) {
     link.style("stroke", null);
     link.attr("opacity", 1);
     label.attr("opacity", 1);
+    d3.select("#graph-barchar > svg").remove();
+    selectedNodes = [];
   }
 
   // Update simulation on each tick
@@ -240,4 +255,69 @@ function renderGraph(dataset) {
       dr = Math.sqrt(dx * dx + dy * dy);
     return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
   }
+}
+
+// Taken from https://d3-graph-gallery.com/graph/barplot_stacked_highlight.html
+function drawBarchar(selectedNodes) {
+  var margin = { top: 20, right: 20, bottom: 400, left: 100 },
+    width = 1900 - margin.left - margin.right,
+    height = 1000 - margin.top - margin.bottom;
+
+  // set the ranges
+  var x = d3.scaleBand().range([0, width]).padding(0.1);
+  var y = d3.scaleLinear().range([height, 0]);
+
+  var svg = d3
+    .select("#graph-barchar")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  const selectedProperty = document.getElementById("propertyToCompare").value;
+  // Scale the range of the data in the domains
+  x.domain(
+    selectedNodes.map(function (d) {
+      return d.title;
+    })
+  );
+  y.domain([
+    0,
+    d3.max(selectedNodes, function (d) {
+      return d[selectedProperty];
+    }),
+  ]);
+
+  // append the rectangles for the bar chart
+  svg
+    .selectAll(".bar")
+    .data(selectedNodes)
+    .enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", function (d) {
+      return x(d.title);
+    })
+    .attr("width", x.bandwidth())
+    .attr("y", function (d) {
+      return y(d[selectedProperty]);
+    })
+    .attr("height", function (d) {
+      return height - y(d[selectedProperty]);
+    });
+
+  // add the x Axis
+  svg
+    .append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .style("text-anchor", "end")
+    .attr("dx", "-.8em")
+    .attr("dy", ".15em")
+    .attr("transform", "rotate(-65)");
+
+  // add the y Axis
+  svg.append("g").call(d3.axisLeft(y));
 }
